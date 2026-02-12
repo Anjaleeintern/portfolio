@@ -1,0 +1,40 @@
+// Portfolio API Server
+
+const express = require("express");
+const mongoose = require("mongoose");
+const cors = require("cors");
+require("dotenv").config();
+
+const app = express();
+
+/* ================= MIDDLEWARE ================= */
+app.use(cors());
+app.use(express.json()); // allows req.body
+
+// Static folder for images
+app.use("/uploads", express.static("uploads"));
+
+/* ================= ROUTES ================= */
+const authRoutes = require("./routes/auth");
+const projectRoutes = require("./routes/projectRoutes");
+const profileRoutes = require("./routes/profileRoutes");
+const experienceRoutes = require("./routes/experienceRoutes");
+const certificationsRoutes = require("./routes/certificationsRoutes");
+
+app.use("/api/auth", authRoutes);
+app.use("/api/projects", projectRoutes);
+app.use("/api/profile", profileRoutes);
+app.use("/api/experience", experienceRoutes);
+app.use("/api/certifications", certificationsRoutes);
+
+
+/* ================= DATABASE ================= */
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => console.log("✅ MongoDB Connected"))
+  .catch(err => console.log("❌ DB Error:", err));
+
+/* ================= TEST ROUTE ================= */
+app.get("/", (req, res) => res.send("Portfolio API Running 🚀"));
+
+/* ================= START SERVER ================= */
+app.listen(5000, () => console.log("🚀 Server running on port 5000"));

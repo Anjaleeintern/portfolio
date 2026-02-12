@@ -1,0 +1,22 @@
+# Node modules
+node_modules/
+backend/portfolio_server/node_modules/
+frontend/portfolio/node_modules/
+
+# Environment files
+.env
+backend/portfolio_server/.env
+frontend/portfolio/.env
+
+# Build folders
+dist/
+build/
+frontend/portfolio/dist/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS files
+.DS_Store
