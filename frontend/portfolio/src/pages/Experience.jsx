@@ -5,12 +5,14 @@ import axios from "axios";
 import { isAdminLoggedIn } from "../utils/isAdmin";
 
 export default function Experience() {
+  const API = process.env.REACT_APP_API_URL
   const admin = isAdminLoggedIn();
   const token = localStorage.getItem("token");
 
   const [experiences, setExperiences] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState(null);
+  
 
   const [form, setForm] = useState({
     title: "",
@@ -22,7 +24,7 @@ export default function Experience() {
   useEffect(() => { fetchData(); }, []);
 
   const fetchData = async () => {
-    const res = await axios.get("http://localhost:5000/api/experience/get-experience");
+    const res = await axios.get(`${API}/api/experience/get-experience`);
     setExperiences(res.data);
   };
 
@@ -31,14 +33,14 @@ export default function Experience() {
 
     if (editing) {
       await axios.put(
-        `http://localhost:5000/api/experience/edit-experience/${editing._id}`,
+        `${API}/api/experience/edit-experience/${editing._id}`,
         form,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       alert("Updated");
     } else {
       await axios.post(
-        "http://localhost:5000/api/experience/add-experience",
+        `${API}/api/experience/add-experience`,
         form,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -52,7 +54,7 @@ export default function Experience() {
   };
 
   const deleteExp = async (id) => {
-    await axios.delete(`http://localhost:5000/api/experience/delete-experience/${id}`, {
+    await axios.delete(`${API}/api/experience/delete-experience/${id}`, {
       headers: { Authorization: `Bearer ${token}` }
     });
     fetchData();

@@ -7,6 +7,8 @@ import axios from "axios";
 
 export default function Home() {
   const [admin, setAdmin] = useState(false);
+  const API =process.env.REACT_APP_API_URL;
+  console.log("API URL:", process.env.REACT_APP_API_URL);
 
   useEffect(() => {
     setAdmin(isAdminLoggedIn());
@@ -20,9 +22,12 @@ export default function Home() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/profile")
+      .get(`${API}/api/profile`)
       .then((res) => setProfile(res.data))
       .catch((err) => console.log(err));
+      console.log("API URL:", process.env.REACT_APP_API_URL
+);
+
   }, []);
 
   return (
@@ -53,7 +58,7 @@ export default function Home() {
             <a
               href={
                 profile?.resume
-                  ? `http://localhost:5000${profile.resume}`
+                  ? `${API}${profile.resume}`
                   : "/AnjaleeBisen.pdf"
               }
               target="_blank"
@@ -86,7 +91,7 @@ export default function Home() {
           <img
             src={
               profile?.photo
-                ? `http://localhost:5000${profile.photo}`
+                ? `${API}${profile.photo}`
                 : "/anjaleephoto.jpeg"
             }
             alt="Anjalee Bisen"
@@ -133,7 +138,7 @@ export default function Home() {
                   formData.append("resume", newResume);
 
                   await axios.put(
-                    "http://localhost:5000/api/profile/update-resume",
+                    `${API}/api/profile/update-resume`,
                     formData,
                     {
                       headers: {
@@ -144,7 +149,7 @@ export default function Home() {
                   );
 
                   setShowResumeModal(false);
-                  const res = await axios.get("http://localhost:5000/api/profile");
+                  const res = await axios.get(`${API}/api/profile`);
                   setProfile(res.data);
                 }}
                 className="bg-cyan-500 px-4 py-1 rounded-lg text-black font-medium"
@@ -183,7 +188,7 @@ export default function Home() {
                   formData.append("photo", newImage);
 
                   await axios.put(
-                    "http://localhost:5000/api/profile/update-photo",
+                    `${API}/api/profile/update-photo`,
                     formData,
                     {
                       headers: {
@@ -194,7 +199,7 @@ export default function Home() {
                   );
 
                   setShowPhotoModal(false);
-                  const res = await axios.get("http://localhost:5000/api/profile");
+                  const res = await axios.get(`${API}/api/profile`);
                   setProfile(res.data);
                 }}
                 className="bg-cyan-500 px-4 py-1 rounded-lg text-black font-medium"

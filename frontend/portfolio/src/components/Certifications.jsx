@@ -4,6 +4,7 @@ import axios from "axios";
 import { isAdminLoggedIn } from "../utils/isAdmin";
 
 export default function Certifications() {
+  const API = process.env.REACT_APP_API_URL;
   const [certs, setCerts] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [editData, setEditData] = useState(null);
@@ -12,6 +13,8 @@ export default function Certifications() {
 
   const token = localStorage.getItem("token");
   const admin = isAdminLoggedIn();
+  
+
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -20,7 +23,7 @@ export default function Certifications() {
   // ================= FETCH =================
   const fetchCerts = async () => {
     const res = await axios.get(
-      "http://localhost:5000/api/certifications/get-certifications"
+      `${API}/api/certifications/get-certifications`
     );
     setCerts(res.data);
   };
@@ -57,13 +60,13 @@ export default function Certifications() {
 
     if (editData) {
       await axios.put(
-        `http://localhost:5000/api/certifications/edit-certification/${editData._id}`,
+        `${API}/api/certifications/edit-certification/${editData._id}`,
         formData,
         { headers: { Authorization: `Bearer ${token}` } }
       );
     } else {
       await axios.post(
-        "http://localhost:5000/api/certifications/add-certification",
+        `${API}/api/certifications/add-certification`,
         formData,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -76,18 +79,12 @@ export default function Certifications() {
   // ================= DELETE =================
   const deleteCert = async (id) => {
     await axios.delete(
-      `http://localhost:5000/api/certifications/delete-certification/${id}`,
+      `${API}/api/certifications/delete-certification/${id}`,
       { headers: { Authorization: `Bearer ${token}` } }
     );
     fetchCerts();
   };
 
-  // ================= IMAGE VIEW =================
-  // const openImage = (img) => {
-  //   console.log("Image name:", img);
-  //   setSelectedImage(img);
-  //   setShowImage(true);
-  // };
 
   return (
     <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-white shadow-md hover:shadow-cyan-400/10 rounded-2xl transition duration-300 hover:-translate-y-1">
@@ -187,7 +184,7 @@ export default function Certifications() {
                     // onClick={() => openImage(cert.image)}
                     onClick={() =>
     window.open(
-      `http://localhost:5000/uploads/${cert.image}`,
+      `${API}/uploads/${cert.image}`,
       "_blank"
     )
   }
@@ -231,7 +228,7 @@ export default function Certifications() {
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 px-4">
           <div className="relative max-w-3xl w-full">
             <img
-              src={`http://localhost:5000/uploads/${certs.image}`}
+              src={`${API}/uploads/${certs.image}`}
               alt="certificate"
               className="w-full rounded-lg"
             />

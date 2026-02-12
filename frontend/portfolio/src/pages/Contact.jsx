@@ -6,6 +6,7 @@ import { isAdminLoggedIn } from "../utils/isAdmin";
 
 export default function Contact() {
   const [showContactModal, setShowContactModal] = useState(false);
+   const API = process.env.REACT_APP_API_URL
   const [contactForm, setContactForm] = useState({
     phone: "",
     email: "",
@@ -15,10 +16,11 @@ export default function Contact() {
   });
   const [contactData, setContactData] = useState(null);
   const [admin, setAdmin] = useState(false);
+ 
 
   useEffect(() => {
     setAdmin(isAdminLoggedIn());
-    axios.get("http://localhost:5000/api/profile/get-contact")
+    axios.get(`${API}/api/profile/get-contact`)
       .then((res) => {
         setContactData(res.data);
         setContactForm(res.data);
@@ -75,11 +77,11 @@ export default function Contact() {
               <button
                 onClick={async () => {
                   const token = localStorage.getItem("token");
-                  await axios.put("http://localhost:5000/api/profile/update-contact", contactForm, {
+                  await axios.put(`${API}/api/profile/update-contact`, contactForm, {
                     headers: { Authorization: `Bearer ${token}` },
                   });
                   alert("Contact Updated");
-                  const res = await axios.get("http://localhost:5000/api/profile/get-contact");
+                  const res = await axios.get(`${API}/api/profile/get-contact`);
                   setContactData(res.data);
                   setShowContactModal(false);
                 }}

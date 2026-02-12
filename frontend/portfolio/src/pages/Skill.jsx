@@ -5,12 +5,14 @@ import axios from "axios";
 import { isAdminLoggedIn } from "../utils/isAdmin";
 
 export default function Skills() {
+  const API = process.env.REACT_APP_API_URL;
   const [skillCategories, setSkillCategories] = useState([]);
   const [mode, setMode] = useState(null); // add / update / delete
   const [selectedId, setSelectedId] = useState("");
   const [title, setTitle] = useState("");
   const [skillsInput, setSkillsInput] = useState(""); // comma separated
   const [admin, setAdmin] = useState(false);
+  
 
   // Check if admin logged in
   useEffect(() => {
@@ -25,7 +27,7 @@ export default function Skills() {
   useEffect(() => {
     const fetchSkills = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/profile");
+        const res = await axios.get(`${API}/api/profile`);
         setSkillCategories(res.data.skills || []);
       } catch (err) {
         console.error(err);
@@ -52,7 +54,7 @@ export default function Skills() {
       const items = skillsInput.split(",").map(s => s.trim());
       const token = getToken();
       const res = await axios.post(
-        "http://localhost:5000/api/profile/add-skill",
+        `${API}/api/profile/add-skill`,
         { title, items },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -71,7 +73,7 @@ export default function Skills() {
       const items = skillsInput.split(",").map(s => s.trim());
       const token = getToken();
       const res = await axios.put(
-        `http://localhost:5000/api/profile/update-skill/${selectedId}`,
+        `${API}/api/profile/update-skill/${selectedId}`,
         { title, items },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -89,7 +91,7 @@ export default function Skills() {
     try {
       const token = getToken();
       const res = await axios.delete(
-        `http://localhost:5000/api/profile/delete-skill/${selectedId}`,
+        `${API}/api/profile/delete-skill/${selectedId}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setSkillCategories(res.data);

@@ -8,13 +8,15 @@ export default function AdminLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const API = process.env.REACT_APP_API_URL;
+
 
   const handleLogin = async (e) => {
     e.preventDefault();
 
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/auth/login",
+        `${API}/api/auth/login`,
         { email, password }
       );
 

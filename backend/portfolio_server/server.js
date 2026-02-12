@@ -11,6 +11,11 @@ const app = express();
 app.use(cors());
 app.use(express.json()); // allows req.body
 
+app.use(cors({
+  origin: "*",  // we will secure later
+  credentials: true
+}));
+
 // Static folder for images
 app.use("/uploads", express.static("uploads"));
 

@@ -7,9 +7,11 @@ import { isAdminLoggedIn } from "../utils/isAdmin";
 import { motion } from "framer-motion";
 
 export default function Projects() {
+   const API = process.env.REACT_APP_API_URL;
   const [projects, setProjects] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [editingProject, setEditingProject] = useState(null);
+ 
 
   const admin = isAdminLoggedIn();
   const token = localStorage.getItem("token");
@@ -17,13 +19,13 @@ export default function Projects() {
   useEffect(() => { fetchProjects(); }, []);
 
   const fetchProjects = async () => {
-    const res = await axios.get("http://localhost:5000/api/projects/get-projects");
+    const res = await axios.get(`${API}/api/projects/get-projects`);
     setProjects(res.data);
   };
 
   const deleteProject = async (id) => {
     if (!window.confirm("Delete project?")) return;
-    await axios.delete(`http://localhost:5000/api/projects/delete-project/${id}`, {
+    await axios.delete(`${API}/api/projects/delete-project/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     fetchProjects();
@@ -32,13 +34,13 @@ export default function Projects() {
   const handleSave = async () => {
     if (editingProject._id) {
       await axios.put(
-        `http://localhost:5000/api/projects/edit-project/${editingProject._id}`,
+        `${API}/api/projects/edit-project/${editingProject._id}`,
         editingProject,
         { headers: { Authorization: `Bearer ${token}` } }
       );
     } else {
       await axios.post(
-        "http://localhost:5000/api/projects/add-project",
+        `${API}/api/projects/add-project`,
         editingProject,
         { headers: { Authorization: `Bearer ${token}` } }
       );
