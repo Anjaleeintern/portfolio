@@ -1,5 +1,5 @@
 // Portfolio API Server
-
+const path = require("path");
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
@@ -17,7 +17,7 @@ app.use(cors({
 }));
 
 // Static folder for images
-app.use("/uploads", express.static("uploads"));
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 /* ================= ROUTES ================= */
 const authRoutes = require("./routes/auth");

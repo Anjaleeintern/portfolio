@@ -24,7 +24,7 @@ router.get("/", async (req, res) => {
 });
 
 
-// 🔹 UPDATE PROFILE INFO
+
 
 router.put(
   "/update-photo",
@@ -32,17 +32,26 @@ router.put(
   upload.single("photo"),
   async (req, res) => {
     try {
+      console.log("FILE RECEIVED:", req.file);
+
       if (!req.file) {
         return res.status(400).json({ msg: "No file uploaded" });
       }
 
       const photoPath = `/uploads/${req.file.filename}`;
+      console.log("PHOTO PATH:", photoPath);
 
-      const profile = await Profile.findOneAndUpdate(
-        {},
-        { photo: photoPath },
-        { new: true, upsert: true }
-      );
+      let profile = await Profile.findOne();
+      console.log("PROFILE BEFORE UPDATE:", profile);
+
+      if (!profile) {
+        profile = await Profile.create({});
+      }
+
+      profile.photo = photoPath;
+      await profile.save();
+
+      console.log("PROFILE AFTER SAVE:", profile);
 
       res.json(profile);
     } catch (err) {
@@ -51,6 +60,7 @@ router.put(
     }
   }
 );
+
 
 // 🔹 UPDATE RESUME
 

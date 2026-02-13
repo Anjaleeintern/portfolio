@@ -1,4 +1,5 @@
 # Node modules
+uploads/
 node_modules/
 backend/portfolio_server/node_modules/
 frontend/portfolio/node_modules/

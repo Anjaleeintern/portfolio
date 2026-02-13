@@ -28,14 +28,18 @@ export default function About() {
           </h2>
 
           <p className="text-gray-400 leading-relaxed text-base sm:text-lg">
-            I'm a Full Stack Developer passionate about building scalable web
-            applications and AI-powered systems. I enjoy turning complex
-            problems into simple, beautiful, and intuitive designs.
+           I am a passionate Full Stack MERN Developer with practical experience in building responsive and scalable web applications using React, Node.js, Express, and MongoDB.
+
+I have developed full-stack projects that include authentication using JWT, REST API integration, database management with MongoDB, and deployment on cloud platforms like Render.
+
+
+
           </p>
 
           <p className="text-gray-400 leading-relaxed text-base sm:text-lg">
-            My focus is on performance, modern UI/UX, and backend logic that
-            makes applications powerful and reliable.
+           I enjoy solving problems, building efficient backend systems, and designing clean user interfaces that enhance user experience.
+
+As a fresher, I am actively looking for internship or entry-level developer opportunities where I can contribute my skills and grow in a collaborative and professional environment.
           </p>
 
           {/* Skills Badges */}

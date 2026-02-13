@@ -25,10 +25,15 @@ export default function Home() {
       .get(`${API}/api/profile`)
       .then((res) => setProfile(res.data))
       .catch((err) => console.log(err));
-      console.log("API URL:", process.env.REACT_APP_API_URL
-);
+//       console.log("API URL:", process.env.REACT_APP_API_URL
+// );
+console.log(profile);
+
+
 
   }, []);
+
+  
 
   return (
     <section
@@ -46,13 +51,17 @@ export default function Home() {
           </h1>
 
           <h2 className="text-lg sm:text-xl lg:text-2xl text-gray-300 font-medium">
-            Full Stack Developer • AI Enthusiast
+            Full Stack MERN Developer | React • Node • MongoDB
+
           </h2>
 
           <p className="text-gray-400 text-base sm:text-lg leading-relaxed max-w-xl mx-auto md:mx-0">
-            I build intelligent web applications using modern technologies,
-            combining clean design, performance, and scalable backend systems.
+            I build responsive and scalable web applications using the MERN stack. 
+
+I focus on clean UI, secure backend architecture, and efficient API integration.
           </p>
+          <p className="text-gray-200 text-base sm:text-lg leading-relaxed max-w-xl mx-auto md:mx-0">
+            Currently open to internship and entry-level opportunities.</p>
 
           <div className="flex flex-wrap justify-center md:justify-start gap-4 pt-4">
             <a
@@ -90,10 +99,10 @@ export default function Home() {
 
           <img
             src={
-              profile?.photo
-                ? `${API}${profile.photo}`
-                : "/anjaleephoto.jpeg"
-            }
+  profile?.photo
+    ? `${API}${profile.photo}?t=${new Date().getTime()}`
+    : "/anjaleephoto.jpeg"
+}
             alt="Anjalee Bisen"
             className="w-56 h-56 sm:w-64 sm:h-64 lg:w-72 lg:h-72 object-cover rounded-full border-4 border-cyan-400 shadow-[0_0_40px_rgba(34,211,238,0.4)] hover:scale-105 transition duration-500 relative z-10"
           />
@@ -142,7 +151,7 @@ export default function Home() {
                     formData,
                     {
                       headers: {
-                        "Content-Type": "multipart/form-data",
+                        
                         Authorization: `Bearer ${token}`,
                       },
                     }
@@ -200,15 +209,21 @@ export default function Home() {
 
                   setShowPhotoModal(false);
                   const res = await axios.get(`${API}/api/profile`);
-                  setProfile(res.data);
+                 
+
+                  console.log("New Profile Data:", res.data);
+setProfile(res.data);
                 }}
                 className="bg-cyan-500 px-4 py-1 rounded-lg text-black font-medium"
               >
                 Save
               </button>
+              
+             
             </div>
           </div>
         </div>
+        
       )}
     </section>
   );
