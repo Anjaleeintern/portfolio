@@ -26,32 +26,63 @@ router.get("/", async (req, res) => {
 
 
 
+// router.put(
+//   "/update-photo",
+//   verifyToken,
+//   upload.single("photo"),
+//   async (req, res) => {
+//     try {
+//       console.log("FILE RECEIVED:", req.file);
+
+//       if (!req.file) {
+//         return res.status(400).json({ msg: "No file uploaded" });
+//       }
+
+//       const photoPath = `/uploads/${req.file.filename}`;
+//       console.log("PHOTO PATH:", photoPath);
+
+//       let profile = await Profile.findOne();
+//       console.log("PROFILE BEFORE UPDATE:", profile);
+
+//       if (!profile) {
+//         profile = await Profile.create({});
+//       }
+
+//       profile.photo = photoPath;
+//       await profile.save();
+
+//       console.log("PROFILE AFTER SAVE:", profile);
+
+//       res.json(profile);
+//     } catch (err) {
+//       console.log("PHOTO UPLOAD ERROR:", err);
+//       res.status(500).json({ msg: "Server crash" });
+//     }
+//   }
+// );
+
+
 router.put(
   "/update-photo",
   verifyToken,
   upload.single("photo"),
   async (req, res) => {
     try {
-      console.log("FILE RECEIVED:", req.file);
-
       if (!req.file) {
         return res.status(400).json({ msg: "No file uploaded" });
       }
 
-      const photoPath = `/uploads/${req.file.filename}`;
-      console.log("PHOTO PATH:", photoPath);
+      // CHANGE THIS: Instead of /uploads/filename, use req.file.path
+      // req.file.path is the full URL provided by Cloudinary
+      const photoPath = req.file.path; 
 
       let profile = await Profile.findOne();
-      console.log("PROFILE BEFORE UPDATE:", profile);
-
       if (!profile) {
         profile = await Profile.create({});
       }
 
       profile.photo = photoPath;
       await profile.save();
-
-      console.log("PROFILE AFTER SAVE:", profile);
 
       res.json(profile);
     } catch (err) {
@@ -64,13 +95,41 @@ router.put(
 
 // 🔹 UPDATE RESUME
 
+// router.put(
+//   "/update-resume",
+//   verifyToken,
+//   upload.single("resume"),
+//   async (req, res) => {
+//     try {
+//       const resumePath = `/uploads/${req.file.filename}`;
+
+//       const profile = await Profile.findOneAndUpdate(
+//         {},
+//         { resume: resumePath },
+//         { new: true, upsert: true }
+//       );
+
+//       res.json(profile);
+//     } catch (err) {
+//       console.log(err);
+//       res.status(500).json({ msg: "Resume upload failed" });
+//     }
+//   }
+// );
+
+
 router.put(
   "/update-resume",
   verifyToken,
   upload.single("resume"),
   async (req, res) => {
     try {
-      const resumePath = `/uploads/${req.file.filename}`;
+      if (!req.file) {
+        return res.status(400).json({ msg: "No file uploaded" });
+      }
+
+      // CHANGE THIS: Use the Cloudinary URL
+      const resumePath = req.file.path;
 
       const profile = await Profile.findOneAndUpdate(
         {},

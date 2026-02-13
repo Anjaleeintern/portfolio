@@ -1,36 +1,27 @@
 
 
 
-const multer = require("multer");
-const path = require("path");
-const fs = require("fs");
+const cloudinary = require('cloudinary').v2;
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const multer = require('multer');
 
-// Ensure uploads directory exists
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_NAME,
+  api_key: process.env.CLOUDINARY_KEY,
+  api_secret: process.env.CLOUDINARY_SECRET
+});
 
-
-const uploadDir = "uploads/";
-if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir);
-
-// Multer storage configuration
-
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "uploads/");
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + path.extname(file.originalname));
+// Configure Storage to Cloudinary instead of local disk
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'portfolio_uploads', // This is the folder name in Cloudinary
+    resource_type: "auto",
+    allowed_formats: ['jpg', 'png', 'jpeg', 'pdf'],
   },
 });
 
-// File filter to allow only images and PDFs
-const fileFilter = (req, file, cb) => {
-  const allowed = /jpg|jpeg|png|pdf/;
-  const ext = allowed.test(path.extname(file.originalname).toLowerCase());
-  if (ext) cb(null, true);
-  else cb("Only images & pdf allowed");
-};
-
-
-const upload = multer({ storage ,fileFilter});
+const upload = multer({ storage });
 
 module.exports = upload;
