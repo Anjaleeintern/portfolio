@@ -24,17 +24,45 @@ export default function Skills() {
   }, []);
 
   // Fetch skills from backend
-  useEffect(() => {
-    const fetchSkills = async () => {
-      try {
-        const res = await axios.get(`${API}/api/profile`);
-        setSkillCategories(res.data.skills || []);
-      } catch (err) {
-        console.error(err);
+  // useEffect(() => {
+  //   const fetchSkills = async () => {
+  //     try {
+  //       const res = await axios.get(`${API}/api/profile`);
+  //       setSkillCategories(res.data.skills || []);
+  //     } catch (err) {
+  //       console.error(err);
+  //     }
+  //   };
+  //   fetchSkills();
+  // }, []);
+
+// Fetch skills from backend (FAST LOAD VERSION)
+useEffect(() => {
+  const fetchSkills = async () => {
+    try {
+      // ✅ STEP 1: load from cache instantly
+      const cached = localStorage.getItem("skillsCache");
+      if (cached) {
+        setSkillCategories(JSON.parse(cached));
       }
-    };
-    fetchSkills();
-  }, []);
+
+      // ✅ STEP 2: fetch fresh data in background
+      const res = await axios.get(`${API}/api/profile`);
+
+      const freshSkills = res.data.skills || [];
+      setSkillCategories(freshSkills);
+
+      // ✅ STEP 3: update cache
+      localStorage.setItem("skillsCache", JSON.stringify(freshSkills));
+
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  fetchSkills();
+}, [API]);
+
 
   // Reset modal form
   const resetForm = () => {
@@ -59,6 +87,8 @@ export default function Skills() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setSkillCategories(res.data);
+      localStorage.setItem("skillsCache", JSON.stringify(res.data));
+
       resetForm();
     } catch (err) {
       console.error(err);
@@ -78,6 +108,8 @@ export default function Skills() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setSkillCategories(res.data);
+      localStorage.setItem("skillsCache", JSON.stringify(res.data));
+
       resetForm();
     } catch (err) {
       console.error(err);
@@ -95,6 +127,8 @@ export default function Skills() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setSkillCategories(res.data);
+      localStorage.setItem("skillsCache", JSON.stringify(res.data));
+
       resetForm();
     } catch (err) {
       console.error(err);
