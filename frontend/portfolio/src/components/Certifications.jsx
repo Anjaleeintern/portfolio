@@ -258,6 +258,11 @@
 // }
 
 
+// This component manages certifications, allowing admins to add, edit, and delete certifications. 
+// It fetches certifications from the backend and displays them in a list. 
+// Each certification can be viewed (opens the document in a new tab), and if the user is an admin, they can also edit or delete certifications. 
+// The form for adding/editing certifications includes fields for title, description, and an image/PDF upload.
+
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { isAdminLoggedIn } from "../utils/isAdmin";
@@ -279,19 +284,29 @@ export default function Certifications() {
   // ================= FETCH =================
   const fetchCerts = async () => {
     try {
-      // ✅ instant UI from cache
-      const cached = getCache("certificationsCache");
-      if (cached) setCerts(cached);
+      // 1️⃣ Show cached data safely
+      const cached = getCache("certifications");
+      if (Array.isArray(cached)) {
+        setCerts(cached);
+      }
 
-      // ✅ fresh data from server
-      const res = await axios.get(
-        `${API}/api/certifications/get-certifications`
-      );
+      // 2️⃣ Check if API URL exists
+      if (!API) {
+        console.error("API URL missing!");
+        return;
+      }
+
+      // 3️⃣ Fetch fresh data from server
+      const res = await axios.get(`${API}/api/certifications/get-certifications`);
+
+      // 4️⃣ Validate response
+      if (!Array.isArray(res.data)) {
+        console.error("Invalid API response:", res.data);
+        return;
+      }
 
       setCerts(res.data);
-
-      // ✅ update cache
-      setCache("certificationsCache", res.data);
+      setCache("certifications", res.data);
 
     } catch (err) {
       console.log("Fetch Error:", err);
@@ -316,7 +331,6 @@ export default function Certifications() {
     setEditData(cert);
     setTitle(cert.title);
     setDescription(cert.description);
-    setImage(null);
     setShowForm(true);
   };
 
@@ -330,6 +344,8 @@ export default function Certifications() {
     if (image) formData.append("image", image);
 
     try {
+      if (!API) return console.error("API URL missing!");
+
       if (editData) {
         await axios.put(
           `${API}/api/certifications/edit-certification/${editData._id}`,
@@ -345,55 +361,57 @@ export default function Certifications() {
       }
 
       setShowForm(false);
-      await fetchCerts();
-
+      fetchCerts();
     } catch (err) {
       console.log("Submit Error:", err);
-      alert("Save failed");
     }
   };
 
   // ================= DELETE =================
   const deleteCert = async (id) => {
-    if (!window.confirm("Delete this certification?")) return;
+    if (!window.confirm("Are you sure you want to delete this?")) return;
 
     try {
-      await axios.delete(
-        `${API}/api/certifications/delete-certification/${id}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      if (!API) return console.error("API URL missing!");
 
-      await fetchCerts();
+      await axios.delete(`${API}/api/certifications/delete-certification/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
+      fetchCerts();
     } catch (err) {
       console.log("Delete Error:", err);
-      alert("Delete failed");
     }
   };
 
   return (
-    <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-white">
+    <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-white shadow-md hover:shadow-cyan-400/10 rounded-2xl transition duration-300 hover:-translate-y-1">
+      {/* HEADER */}
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-8 gap-4">
         <h2 className="text-2xl sm:text-3xl font-bold">Certifications</h2>
 
         {admin && (
           <button
             onClick={openAdd}
-            className="bg-cyan-500 hover:bg-cyan-600 px-4 py-2 rounded-lg"
+            className="bg-cyan-500 hover:bg-cyan-600 px-4 py-2 rounded-lg transition"
           >
             + Add Certification
           </button>
         )}
       </div>
 
+      {/* FORM */}
       {showForm && (
-        <form onSubmit={submit} className="bg-gray-900 p-6 rounded-xl mb-8 max-w-md">
+        <form
+          onSubmit={submit}
+          className="bg-gray-900 p-6 rounded-xl mb-8 w-full sm:w-[500px]"
+        >
           <h3 className="text-lg mb-4">
             {editData ? "Edit Certification" : "Add Certification"}
           </h3>
 
           <input
-            className="w-full p-2 rounded bg-gray-800 mb-3"
+            className="w-full p-2 rounded bg-gray-800 mb-3 text-white"
             placeholder="Title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
@@ -401,7 +419,7 @@ export default function Certifications() {
           />
 
           <textarea
-            className="w-full p-2 rounded bg-gray-800 mb-3"
+            className="w-full p-2 rounded bg-gray-800 mb-3 text-white"
             placeholder="Description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
@@ -409,50 +427,72 @@ export default function Certifications() {
 
           <input
             type="file"
+            className="mb-3 text-sm text-gray-400"
             accept="image/*,application/pdf"
             onChange={(e) => setImage(e.target.files[0])}
-            className="mb-3"
           />
 
-          <div className="flex gap-3">
-            <button type="button" onClick={() => setShowForm(false)} className="bg-gray-600 px-4 py-1 rounded">
+          <div className="flex justify-end gap-3">
+            <button
+              type="button"
+              onClick={() => setShowForm(false)}
+              className="bg-gray-500 px-4 py-1 rounded"
+            >
               Cancel
             </button>
-            <button type="submit" className="bg-cyan-500 px-4 py-1 rounded text-black">
+            <button
+              type="submit"
+              className="bg-cyan-500 px-4 py-1 rounded text-black font-medium"
+            >
               Save
             </button>
           </div>
         </form>
       )}
 
+      {/* CERTIFICATION LIST */}
       <div className="space-y-6">
-        {certs.length === 0 ? (
+        {!Array.isArray(certs) || certs.length === 0 ? (
           <p className="text-gray-400">No certifications added yet.</p>
         ) : (
-          certs.map((cert) => (
-            <div key={cert._id} className="border-l-4 border-cyan-400 pl-4 py-4 bg-gray-900 rounded-lg">
+          (Array.isArray(certs) ? certs : []).map((cert) => (
+            <div
+              key={cert._id}
+              className="border-l-4 border-cyan-400 pl-4 py-4 bg-gray-900/60 rounded-lg hover:bg-gray-800 transition"
+            >
               <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+                {/* LEFT */}
                 <div>
                   <h3 className="text-lg font-semibold">{cert.title}</h3>
                   <p className="text-gray-400 text-sm">{cert.description}</p>
                 </div>
 
-                <div className="flex gap-2">
-                  {cert.image && (
-                    <button
-                      onClick={() => window.open(cert.image, "_blank")}
-                      className="px-3 py-1 bg-cyan-500 rounded text-sm"
-                    >
-                      View Document
-                    </button>
-                  )}
+                {/* RIGHT BUTTONS */}
+                <div className="flex gap-2 flex-wrap">
+                  <button
+                    onClick={() => {
+                      if (cert.image) {
+                        window.open(cert.image, "_blank", "noopener,noreferrer");
+                      }
+                    }}
+                    className="px-3 py-1 bg-cyan-500 hover:bg-cyan-600 rounded text-sm text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5"
+                  >
+                    View Document
+                  </button>
 
                   {admin && (
                     <>
-                      <button onClick={() => openEdit(cert)} className="px-3 py-1 bg-yellow-500 rounded text-sm text-black">
+                      <button
+                        onClick={() => openEdit(cert)}
+                        className="px-3 py-1 bg-yellow-500 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-yellow-600 text-black rounded text-sm"
+                      >
                         Edit
                       </button>
-                      <button onClick={() => deleteCert(cert._id)} className="px-3 py-1 bg-red-600 rounded text-sm">
+
+                      <button
+                        onClick={() => deleteCert(cert._id)}
+                        className="px-3 py-1 bg-red-600 hover:bg-red-500 text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 rounded text-sm"
+                      >
                         Delete
                       </button>
                     </>
