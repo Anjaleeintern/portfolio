@@ -1,4 +1,5 @@
 // PROJECTS PAGE COMPONENT
+import { getCache, setCache } from "../utils/cache";
 
 import { useEffect, useState } from "react";
 import axios from "axios";
@@ -17,10 +18,13 @@ export default function Projects() {
   const token = localStorage.getItem("token");
 
   useEffect(() => { fetchProjects(); }, []);
+   const cached = getCache("projectsCache");
+  if (cached) setProjects(cached);
 
   const fetchProjects = async () => {
     const res = await axios.get(`${API}/api/projects/get-projects`);
     setProjects(res.data);
+    setCache("projectsCache", res.data);
   };
 
   const deleteProject = async (id) => {

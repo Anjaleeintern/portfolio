@@ -1,5 +1,6 @@
 // EXPERIENCE PAGE COMPONENT
 
+import { getCache, setCache } from "../utils/cache";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { isAdminLoggedIn } from "../utils/isAdmin";
@@ -24,8 +25,11 @@ export default function Experience() {
   useEffect(() => { fetchData(); }, []);
 
   const fetchData = async () => {
+    const cached = getCache("experienceCache");
+  if (cached) setExperiences(cached);
     const res = await axios.get(`${API}/api/experience/get-experience`);
     setExperiences(res.data);
+    setCache("experienceCache", res.data);
   };
 
   const handleSubmit = async (e) => {

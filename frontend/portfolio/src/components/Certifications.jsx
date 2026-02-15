@@ -2,6 +2,8 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { isAdminLoggedIn } from "../utils/isAdmin";
+import { getCache, setCache } from "../utils/cache";
+
 
 export default function Certifications() {
   const API = process.env.REACT_APP_API_URL;

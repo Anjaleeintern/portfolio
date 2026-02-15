@@ -3,6 +3,7 @@ import { Mail, Phone, MapPin, Linkedin, Github, Edit } from "lucide-react";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { isAdminLoggedIn } from "../utils/isAdmin";
+import { getCache, setCache } from "../utils/cache";
 
 export default function Contact() {
   const [showContactModal, setShowContactModal] = useState(false);
@@ -20,10 +21,13 @@ export default function Contact() {
 
   useEffect(() => {
     setAdmin(isAdminLoggedIn());
+    const cached = getCache("contactCache");
+  if (cached) setContactData(cached);
     axios.get(`${API}/api/profile/get-contact`)
       .then((res) => {
         setContactData(res.data);
         setContactForm(res.data);
+        setCache("contactCache", res.data);
       })
       .catch((err) => console.log(err));
   }, []);
