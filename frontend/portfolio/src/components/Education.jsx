@@ -13,7 +13,7 @@ export default function EducationInfo() {
 
       <div className="flex flex-col sm:flex-row sm:justify-between mt-5 text-gray-400 text-sm sm:text-base font-medium gap-1 sm:gap-0">
         <span>2021 – 2025</span>
-        <span className="text-cyan-400">CGPA: 8.5</span>
+        <span className="text-cyan-400">CGPA: 7.91</span>
       </div>
 
     </div>
