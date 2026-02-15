@@ -45,64 +45,130 @@ export default function Home() {
   };
 
   // Handle profile photo update
+  // const handlePhotoUpdate = async () => {
+  //   const token = getToken();
+  //   if (!token) return alert("You must be logged in as admin!");
+  //   if (!newImage) return alert("Please select a photo to upload!");
+
+  //   try {
+  //     const formData = new FormData();
+  //     formData.append("photo", newImage);
+
+  //     await axios.put(`${API}/api/profile/update-photo`, formData, {
+  //       headers: {
+  //         "Content-Type": "multipart/form-data",
+  //         Authorization: `Bearer ${token}`,
+  //       },
+  //     });
+
+  //     setShowPhotoModal(false);
+  //     setNewImage(null);
+  //     setPhotoVersion(Date.now()); // force image refresh
+  //     fetchProfile(); // fetch updated data
+  //     setUpdateMessage("Profile photo updated successfully!");
+  //     setTimeout(() => setUpdateMessage(""), 3000);
+  //   } catch (err) {
+  //     if (err.response?.status === 401) alert("Unauthorized! Please login again.");
+  //     else alert("Failed to update photo. Check console.");
+  //     console.error(err);
+  //   }
+  // };
+
   const handlePhotoUpdate = async () => {
-    const token = getToken();
-    if (!token) return alert("You must be logged in as admin!");
-    if (!newImage) return alert("Please select a photo to upload!");
+  const token = getToken();
+  if (!token) return alert("You must be logged in as admin!");
+  if (!newImage) return alert("Please select a photo to upload!");
 
-    try {
-      const formData = new FormData();
-      formData.append("photo", newImage);
+  // Create a temporary URL for immediate display
+  const tempUrl = URL.createObjectURL(newImage);
+  setProfile(prev => ({ ...prev, photo: tempUrl }));
 
-      await axios.put(`${API}/api/profile/update-photo`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+  setShowPhotoModal(false);
+  setNewImage(null);
 
-      setShowPhotoModal(false);
-      setNewImage(null);
-      setPhotoVersion(Date.now()); // force image refresh
-      fetchProfile(); // fetch updated data
-      setUpdateMessage("Profile photo updated successfully!");
-      setTimeout(() => setUpdateMessage(""), 3000);
-    } catch (err) {
-      if (err.response?.status === 401) alert("Unauthorized! Please login again.");
-      else alert("Failed to update photo. Check console.");
-      console.error(err);
-    }
-  };
+  try {
+    const formData = new FormData();
+    formData.append("photo", newImage);
+
+    await axios.put(`${API}/api/profile/update-photo`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    // Optionally re-fetch backend version after upload
+    fetchProfile();
+  } catch (err) {
+    alert("Failed to update photo. Reverting...");
+    console.error(err);
+    fetchProfile(); // Revert to server version
+  }
+};
+
 
   // Handle resume update
+  // const handleResumeUpdate = async () => {
+  //   const token = getToken();
+  //   if (!token) return alert("You must be logged in as admin!");
+  //   if (!newResume) return alert("Please select a resume to upload!");
+
+  //   try {
+  //     const formData = new FormData();
+  //     formData.append("resume", newResume);
+
+  //     await axios.put(`${API}/api/profile/update-resume`, formData, {
+  //       headers: {
+  //         "Content-Type": "multipart/form-data",
+  //         Authorization: `Bearer ${token}`,
+  //       },
+  //     });
+
+  //     setShowResumeModal(false);
+  //     setNewResume(null);
+  //     setResumeVersion(Date.now()); // force resume refresh
+  //     fetchProfile();
+  //     setUpdateMessage("Resume updated successfully!");
+  //     setTimeout(() => setUpdateMessage(""), 3000);
+  //   } catch (err) {
+  //     if (err.response?.status === 401) alert("Unauthorized! Please login again.");
+  //     else alert("Failed to update resume. Check console.");
+  //     console.error(err);
+  //   }
+  // };
+
+
   const handleResumeUpdate = async () => {
-    const token = getToken();
-    if (!token) return alert("You must be logged in as admin!");
-    if (!newResume) return alert("Please select a resume to upload!");
+  const token = getToken();
+  if (!token) return alert("You must be logged in as admin!");
+  if (!newResume) return alert("Please select a resume to upload!");
 
-    try {
-      const formData = new FormData();
-      formData.append("resume", newResume);
+  // Show temporary link immediately
+  const tempUrl = URL.createObjectURL(newResume);
+  setProfile(prev => ({ ...prev, resume: tempUrl }));
 
-      await axios.put(`${API}/api/profile/update-resume`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+  setShowResumeModal(false);
+  setNewResume(null);
 
-      setShowResumeModal(false);
-      setNewResume(null);
-      setResumeVersion(Date.now()); // force resume refresh
-      fetchProfile();
-      setUpdateMessage("Resume updated successfully!");
-      setTimeout(() => setUpdateMessage(""), 3000);
-    } catch (err) {
-      if (err.response?.status === 401) alert("Unauthorized! Please login again.");
-      else alert("Failed to update resume. Check console.");
-      console.error(err);
-    }
-  };
+  try {
+    const formData = new FormData();
+    formData.append("resume", newResume);
+
+    await axios.put(`${API}/api/profile/update-resume`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    fetchProfile(); // Sync backend version
+  } catch (err) {
+    alert("Failed to update resume. Reverting...");
+    console.error(err);
+    fetchProfile(); // Revert to server version
+  }
+};
+
 
   return (
     <section
