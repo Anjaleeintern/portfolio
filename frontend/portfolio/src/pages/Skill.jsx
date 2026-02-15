@@ -3,6 +3,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { isAdminLoggedIn } from "../utils/isAdmin";
+import { getCache, setCache } from "../utils/cache";
+
 
 export default function Skills() {
   const API = process.env.REACT_APP_API_URL;
@@ -40,20 +42,18 @@ export default function Skills() {
 useEffect(() => {
   const fetchSkills = async () => {
     try {
-      // ✅ STEP 1: load from cache instantly
-      const cached = localStorage.getItem("skillsCache");
-      if (cached) {
-        setSkillCategories(JSON.parse(cached));
+      // ✅ load cache instantly
+      const cached = getCache("skillsCache");
+      if (cached && Array.isArray(cached)) {
+        setSkillCategories(cached);
       }
 
-      // ✅ STEP 2: fetch fresh data in background
+      // ✅ fetch fresh data
       const res = await axios.get(`${API}/api/profile`);
-
       const freshSkills = res.data.skills || [];
-      setSkillCategories(freshSkills);
 
-      // ✅ STEP 3: update cache
-      localStorage.setItem("skillsCache", JSON.stringify(freshSkills));
+      setSkillCategories(freshSkills);
+      setCache("skillsCache", freshSkills);
 
     } catch (err) {
       console.error(err);
@@ -61,7 +61,9 @@ useEffect(() => {
   };
 
   fetchSkills();
-}, [API]);
+}, []);
+
+
 
 
   // Reset modal form
@@ -87,7 +89,7 @@ useEffect(() => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setSkillCategories(res.data);
-      localStorage.setItem("skillsCache", JSON.stringify(res.data));
+     setCache("skillsCache", res.data);
 
       resetForm();
     } catch (err) {
@@ -108,7 +110,7 @@ useEffect(() => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setSkillCategories(res.data);
-      localStorage.setItem("skillsCache", JSON.stringify(res.data));
+      setCache("skillsCache", res.data);
 
       resetForm();
     } catch (err) {
@@ -127,7 +129,7 @@ useEffect(() => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setSkillCategories(res.data);
-      localStorage.setItem("skillsCache", JSON.stringify(res.data));
+      setCache("skillsCache", res.data);
 
       resetForm();
     } catch (err) {
@@ -242,7 +244,7 @@ return (
 
       {/* Skills Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-        {skillCategories.map((category, index) => (
+        {Array.isArray(skillCategories) && skillCategories.map((category, index) => (
           <div
             key={category._id || index}
             className="bg-white/5 border border-white/10 rounded-2xl p-6 shadow-md hover:shadow-cyan-500/30 hover:-translate-y-1 transition duration-300"
@@ -252,7 +254,7 @@ return (
             </h3>
 
             <div className="flex flex-wrap gap-2">
-              {category.items.map((skill, i) => (
+              { Array.isArray(category.items) && category.items.map((skill, i) => (
                 <span
                   key={i}
                   className="px-3 py-1 text-xs sm:text-sm bg-cyan-500/10 border border-cyan-400 rounded-md hover:bg-cyan-400 hover:text-black transition"

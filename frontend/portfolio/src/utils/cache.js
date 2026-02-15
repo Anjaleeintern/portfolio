@@ -1,6 +1,11 @@
 export const getCache = (key) => {
-  const data = localStorage.getItem(key);
-  return data ? JSON.parse(data) : null;
+  try {
+    const data = localStorage.getItem(key);
+    return data ? JSON.parse(data) : null;
+  } catch {
+    localStorage.removeItem(key);
+    return null;
+  }
 };
 
 export const setCache = (key, data) => {

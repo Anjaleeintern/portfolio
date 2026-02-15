@@ -7,7 +7,7 @@ import { getCache, setCache } from "../utils/cache";
 
 export default function Contact() {
   const [showContactModal, setShowContactModal] = useState(false);
-   const API = process.env.REACT_APP_API_URL
+  const API = process.env.REACT_APP_API_URL;
   const [contactForm, setContactForm] = useState({
     phone: "",
     email: "",
@@ -17,19 +17,31 @@ export default function Contact() {
   });
   const [contactData, setContactData] = useState(null);
   const [admin, setAdmin] = useState(false);
- 
 
   useEffect(() => {
     setAdmin(isAdminLoggedIn());
-    const cached = getCache("contactCache");
-  if (cached) setContactData(cached);
-    axios.get(`${API}/api/profile/get-contact`)
-      .then((res) => {
+
+    const fetchContact = async () => {
+      try {
+        // ✅ load cache instantly
+        const cached = getCache("contactCache");
+        if (cached && typeof cached === "object") {
+          setContactData(cached);
+          setContactForm(cached);
+        }
+
+        // ✅ fetch fresh data in background
+        const res = await axios.get(`${API}/api/profile/get-contact`);
+
         setContactData(res.data);
         setContactForm(res.data);
         setCache("contactCache", res.data);
-      })
-      .catch((err) => console.log(err));
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    fetchContact();
   }, []);
 
   return (
@@ -48,11 +60,34 @@ export default function Contact() {
 
       {/* CONTACT CARDS — COMPACT */}
       <div className="max-w-lg mx-auto space-y-4  transition duration-300 hover:-translate-y-1">
-        <Card icon={<Phone size={18} />} title="Contact Number" value={contactData?.phone || "Not Added"} />
-        <Card icon={<Mail size={18} />} title="Email" value={contactData?.email || "Not Added"} link={`mailto:${contactData?.email}`} />
-        <Card icon={<Linkedin size={18} />} title="LinkedIn" value={contactData?.linkedin} link={contactData?.linkedin} />
-        <Card icon={<Github size={18} />} title="GitHub" value={contactData?.github} link={contactData?.github} />
-        <Card icon={<MapPin size={18} />} title="Location" value={contactData?.location || "Not Added"} />
+        <Card
+          icon={<Phone size={18} />}
+          title="Contact Number"
+          value={contactData?.phone || "Not Added"}
+        />
+        <Card
+          icon={<Mail size={18} />}
+          title="Email"
+          value={contactData?.email || "Not Added"}
+          link={`mailto:${contactData?.email}`}
+        />
+        <Card
+          icon={<Linkedin size={18} />}
+          title="LinkedIn"
+          value={contactData?.linkedin}
+          link={contactData?.linkedin}
+        />
+        <Card
+          icon={<Github size={18} />}
+          title="GitHub"
+          value={contactData?.github}
+          link={contactData?.github}
+        />
+        <Card
+          icon={<MapPin size={18} />}
+          title="Location"
+          value={contactData?.location || "Not Added"}
+        />
       </div>
 
       {/* FLOATING EDIT BUTTON */}
@@ -69,25 +104,70 @@ export default function Contact() {
       {showContactModal && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex justify-center items-center z-50 px-4">
           <div className="bg-gray-900 border border-cyan-400/10 p-6 sm:p-8 rounded-2xl w-full max-w-md space-y-4 shadow-xl">
-            <h3 className="text-xl font-semibold text-cyan-400">Update Contact Info</h3>
+            <h3 className="text-xl font-semibold text-cyan-400">
+              Update Contact Info
+            </h3>
 
-            <Input label="Phone" onChange={(e)=>setContactForm({...contactForm, phone:e.target.value})} />
-            <Input label="Email" onChange={(e)=>setContactForm({...contactForm, email:e.target.value})} />
-            <Input label="Location" onChange={(e)=>setContactForm({...contactForm, location:e.target.value})} />
-            <Input label="LinkedIn URL" onChange={(e)=>setContactForm({...contactForm, linkedin:e.target.value})} />
-            <Input label="GitHub URL" onChange={(e)=>setContactForm({...contactForm, github:e.target.value})} />
+            <Input
+              label="Phone"
+              onChange={(e) =>
+                setContactForm({ ...contactForm, phone: e.target.value })
+              }
+            />
+            <Input
+              label="Email"
+              onChange={(e) =>
+                setContactForm({ ...contactForm, email: e.target.value })
+              }
+            />
+            <Input
+              label="Location"
+              onChange={(e) =>
+                setContactForm({ ...contactForm, location: e.target.value })
+              }
+            />
+            <Input
+              label="LinkedIn URL"
+              onChange={(e) =>
+                setContactForm({ ...contactForm, linkedin: e.target.value })
+              }
+            />
+            <Input
+              label="GitHub URL"
+              onChange={(e) =>
+                setContactForm({ ...contactForm, github: e.target.value })
+              }
+            />
 
             <div className="flex flex-col gap-3 pt-2">
               <button
                 onClick={async () => {
-                  const token = localStorage.getItem("token");
-                  await axios.put(`${API}/api/profile/update-contact`, contactForm, {
-                    headers: { Authorization: `Bearer ${token}` },
-                  });
-                  alert("Contact Updated");
-                  const res = await axios.get(`${API}/api/profile/get-contact`);
-                  setContactData(res.data);
-                  setShowContactModal(false);
+                  try {
+                    const token = localStorage.getItem("token");
+
+                    await axios.put(
+                      `${API}/api/profile/update-contact`,
+                      contactForm,
+                      { headers: { Authorization: `Bearer ${token}` } },
+                    );
+
+                    alert("Contact Updated");
+
+                    // ✅ fetch updated data
+                    const res = await axios.get(
+                      `${API}/api/profile/get-contact`,
+                    );
+
+                    // ✅ update UI + cache
+                    setContactData(res.data);
+                    setContactForm(res.data);
+                    setCache("contactCache", res.data);
+
+                    setShowContactModal(false);
+                  } catch (err) {
+                    console.log(err);
+                    alert("Update failed");
+                  }
                 }}
                 className="bg-cyan-500 hover:bg-cyan-400 text-black py-2 rounded-lg font-medium transition"
               >
@@ -116,7 +196,12 @@ function Card({ icon, title, value, link }) {
       <div className="flex-1">
         <h3 className="text-sm font-semibold">{title}</h3>
         {link ? (
-          <a href={link} target="_blank" rel="noreferrer" className="text-gray-400 text-xs hover:text-cyan-400 break-all">
+          <a
+            href={link}
+            target="_blank"
+            rel="noreferrer"
+            className="text-gray-400 text-xs hover:text-cyan-400 break-all"
+          >
             {value}
           </a>
         ) : (
