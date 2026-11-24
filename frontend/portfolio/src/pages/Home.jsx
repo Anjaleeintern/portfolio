@@ -2,6 +2,7 @@ import AdminUpdateButton from "../Admin/AdminUpdateButton";
 import { isAdminLoggedIn } from "../utils/isAdmin";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { motion } from "framer-motion";
 
 export default function Home() {
   const [admin, setAdmin] = useState(false);
@@ -170,12 +171,15 @@ export default function Home() {
 };
 
 
+  const displayName = profile?.name ? profile.name.trim().split(" ")[0] : "Anjalee";
+  const nameLetters = Array.from(displayName);
+
   return (
     <section
       id="home"
-      className="relative min-h-screen pt-24 flex items-center justify-center px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-black via-gray-900 to-black overflow-hidden"
+      className="relative min-h-screen pt-28 pb-16 flex items-center justify-center px-4 sm:px-6 lg:px-12 bg-gradient-to-br from-black via-gray-900 to-black overflow-hidden"
     >
-      <div className="absolute w-[500px] h-[500px] bg-cyan-500/20 blur-[140px] rounded-full top-10 left-10"></div>
+      <div className="absolute w-[500px] h-[500px] bg-cyan-500/20 blur-[140px] rounded-full top-10 left-10 pointer-events-none"></div>
 
       {/* Feedback message */}
       {updateMessage && (
@@ -184,25 +188,79 @@ export default function Home() {
         </div>
       )}
 
-      <div className="max-w-7xl w-full grid md:grid-cols-2 gap-12 items-center relative z-10">
-        {/* LEFT SIDE */}
+      <div className="max-w-7xl w-full grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-12 lg:gap-16 items-center relative z-10">
+        {/* LEFT SIDE: Animated Text */}
         <div className="text-white space-y-6 text-center md:text-left">
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight tracking-tight">
-            Hi, I'm <span className="text-cyan-400">Anjalee</span> 👋
-          </h1>
-          <h2 className="text-lg sm:text-xl lg:text-2xl text-gray-300 font-medium">
-            Full Stack MERN Developer | React • Node • MongoDB
-          </h2>
-          <p className="text-gray-400 text-base sm:text-lg leading-relaxed max-w-xl mx-auto md:mx-0">
-            I build responsive and scalable web applications using the MERN stack.
-          </p>
+          {/* Animated Heading with Letter-by-Letter Name */}
+          <motion.h1
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="text-3xl sm:text-5xl lg:text-6xl font-extrabold leading-tight tracking-tight flex flex-wrap items-center justify-center md:justify-start gap-x-2.5 gap-y-1"
+          >
+            <span className="whitespace-nowrap">Hi, I'm</span>
+            <span className="text-cyan-400 inline-flex overflow-hidden">
+              {nameLetters.map((char, index) => (
+                <motion.span
+                  key={index}
+                  initial={{ opacity: 0, y: 25, scale: 0.8 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  transition={{
+                    duration: 0.45,
+                    delay: 0.2 + index * 0.09,
+                    type: "spring",
+                    damping: 12,
+                    stiffness: 180,
+                  }}
+                  className="inline-block"
+                >
+                  {char === " " ? "\u00A0" : char}
+                </motion.span>
+              ))}
+            </span>
+            <motion.span
+              animate={{ rotate: [0, 16, -10, 16, -4, 10, 0] }}
+              transition={{
+                duration: 2,
+                repeat: Infinity,
+                repeatDelay: 1.5,
+                ease: "easeInOut",
+              }}
+              className="inline-block origin-[70%_70%] select-none cursor-default ml-1"
+            >
+              👋
+            </motion.span>
+          </motion.h1>
 
-          <div className="flex flex-wrap justify-center md:justify-start gap-4 pt-4">
+          <motion.h2
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.35 }}
+            className="text-base sm:text-xl lg:text-2xl text-gray-300 font-medium leading-snug"
+          >
+            Full Stack MERN Developer | React • Node • MongoDB
+          </motion.h2>
+
+          <motion.p
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.5 }}
+            className="text-gray-400 text-sm sm:text-base lg:text-lg leading-relaxed max-w-xl mx-auto md:mx-0"
+          >
+            I build responsive and scalable web applications using the MERN stack.
+          </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.65 }}
+            className="flex flex-wrap justify-center md:justify-start items-center gap-3 sm:gap-4 pt-3"
+          >
             <a
               href={profile?.resume ? `${profile.resume}?v=${resumeVersion}` : "/AnjaleeBisen.pdf"}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl text-white font-medium shadow-lg hover:scale-105 transition duration-300"
+              className="px-5 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl text-white font-medium shadow-lg shadow-cyan-500/25 hover:scale-105 transition duration-300"
             >
               View Resume
             </a>
@@ -213,27 +271,38 @@ export default function Home() {
 
             <a
               href="#contact"
-              className="px-6 py-3 border border-cyan-400 text-cyan-300 rounded-xl hover:bg-cyan-500/10 hover:scale-105 transition duration-300"
+              className="px-5 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base border border-cyan-400 text-cyan-300 rounded-xl hover:bg-cyan-500/10 hover:scale-105 transition duration-300"
             >
               Contact Me
             </a>
-          </div>
+          </motion.div>
         </div>
 
-        {/* RIGHT SIDE PHOTO */}
-        <div className="flex flex-col items-center relative">
-          <div className="absolute w-72 h-72 bg-cyan-500 rounded-full blur-3xl opacity-20"></div>
-          <img
+        {/* RIGHT SIDE: Profile Photo (Enlarged & Responsive) */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.7, delay: 0.3 }}
+          className="flex flex-col items-center justify-center relative mt-4 md:mt-0"
+        >
+          {/* Ambient Glow Backdrop */}
+          <div className="absolute w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96 lg:w-[420px] lg:h-[420px] bg-cyan-500/25 rounded-full blur-3xl pointer-events-none"></div>
+
+          {/* Floating Enlarged Circular Profile Photo */}
+          <motion.img
+            animate={{ y: [0, -10, 0] }}
+            transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
             src={profile?.photo ? `${profile.photo}?v=${photoVersion}` : "/anjaleephoto.jpeg"}
-            alt="Anjalee Bisen"
-            className="w-56 h-56 sm:w-64 sm:h-64 lg:w-72 lg:h-72 object-cover rounded-full border-4 border-cyan-400 shadow-[0_0_40px_rgba(34,211,238,0.4)] hover:scale-105 transition duration-500 relative z-10"
+            alt={profile?.name || "Anjalee Bisen"}
+            className="w-60 h-60 sm:w-72 sm:h-72 md:w-80 md:h-80 lg:w-[350px] lg:h-[350px] xl:w-[380px] xl:h-[380px] object-cover rounded-full border-4 border-cyan-400 shadow-[0_0_50px_rgba(34,211,238,0.45)] hover:shadow-[0_0_65px_rgba(34,211,238,0.7)] hover:scale-[1.03] transition duration-500 relative z-10"
           />
+
           {admin && (
-            <div className="mt-4">
+            <div className="mt-5 relative z-10">
               <AdminUpdateButton label="Photo" onClick={() => setShowPhotoModal(true)} />
             </div>
           )}
-        </div>
+        </motion.div>
       </div>
 
       {/* MODALS */}

@@ -7,6 +7,7 @@ import Experience from "../pages/Experience";
 import Projects from "../pages/Projects";
 import Skills from "../pages/Skill";        
 import EducationSection from "../pages/EducationSection";
+import Footer from "../components/Footer";
 // import AdminAddProject from "../Admin/AdminAddProject";
 // import AdminControls from "../Admin/AdminControls";
 
@@ -27,6 +28,7 @@ export default function PublicLayout() {
         <Experience/>
         <EducationSection/>
         <Contact/>
+        <Footer />
     </div>
   );
 }

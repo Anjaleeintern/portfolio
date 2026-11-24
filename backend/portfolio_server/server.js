@@ -8,12 +8,12 @@ require("dotenv").config();
 const app = express();
 
 /* ================= MIDDLEWARE ================= */
-app.use(cors());
+app.use(cors());// Allow all origins for now, we will restrict in production
 app.use(express.json()); // allows req.body
 
 app.use(cors({
   origin: "*",  // we will secure later
-  credentials: true
+  credentials: true // allow cookies if needed
 }));
 
 // Static folder for images

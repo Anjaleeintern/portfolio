@@ -174,4 +174,63 @@ router.delete("/delete-skill/:id", verifyToken, async (req, res) => {
   }
 });
 
+// GET ABOUT DATA
+router.get("/get-about", async (req, res) => {
+  try {
+    let profile = await Profile.findOne();
+    if (!profile) {
+      profile = await Profile.create({});
+    }
+
+    const defaultAbout = {
+      description: "I am a passionate Full Stack MERN Developer with practical experience in building responsive and scalable web applications using React, Node.js, Express, and MongoDB.\n\nI have developed full-stack projects that include authentication using JWT, REST API integration, database management with MongoDB, and deployment on cloud platforms like Render.",
+      subDescription: "I enjoy solving problems, building efficient backend systems, and designing clean user interfaces that enhance user experience.\n\nAs a fresher, I am actively looking for internship or entry-level developer opportunities where I can contribute my skills and grow in a collaborative and professional environment.",
+      badges: ["🚀 Fast Learner", "🤖 AI Enthusiast", "💡 Problem Solver"],
+      image: "/lapi.png"
+    };
+
+    const aboutData = {
+      description: profile.about?.description || defaultAbout.description,
+      subDescription: profile.about?.subDescription || defaultAbout.subDescription,
+      badges: (profile.about?.badges && profile.about.badges.length > 0) ? profile.about.badges : defaultAbout.badges,
+      image: profile.about?.image || defaultAbout.image
+    };
+
+    res.json(aboutData);
+  } catch (err) {
+    res.status(500).json({ msg: "Error fetching about data: " + err.message });
+  }
+});
+
+// UPDATE ABOUT DATA
+router.put("/update-about", verifyToken, async (req, res) => {
+  try {
+    const { description, subDescription, badges, image } = req.body;
+
+    let processedBadges = badges;
+    if (typeof badges === "string") {
+      processedBadges = badges.split(",").map(b => b.trim()).filter(Boolean);
+    }
+
+    const updateData = {
+      "about.description": description !== undefined ? description : "",
+      "about.subDescription": subDescription !== undefined ? subDescription : "",
+      "about.badges": Array.isArray(processedBadges) ? processedBadges : [],
+    };
+    if (image !== undefined && image !== "") {
+      updateData["about.image"] = image;
+    }
+
+    const profile = await Profile.findOneAndUpdate(
+      {},
+      { $set: updateData },
+      { new: true, upsert: true }
+    );
+
+    res.json(profile.about);
+  } catch (err) {
+    res.status(500).json({ msg: "About update failed: " + err.message });
+  }
+});
+
 module.exports = router;

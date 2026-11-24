@@ -22,6 +22,12 @@ const ProfileSchema = new mongoose.Schema({
     github: String,
   },
   skills: [SkillSchema],
+  about: {
+    description: { type: String, default: "" },
+    subDescription: { type: String, default: "" },
+    badges: [{ type: String }],
+    image: { type: String, default: "" },
+  },
 }, { timestamps: true });
 
 ProfileSchema.index({ "skills.title": 1 });
